@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -22,8 +23,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import static java.lang.Math.pow;
@@ -100,20 +105,23 @@ public class MainActivity extends AppCompatActivity {
     double newCNG_MinCharge;
     int GCV=1500;
 
-    double Previous_Reading;
-    double Current_Reading;
+    Integer Previous_Reading;
+    Integer Current_Reading;
 
     TextView t1,t2,t3,t4,t5;
-    EditText e1,e2,e3,e4,e5;
+    EditText e1,e2,e3,e4;
     Button b1;
 
     int red = Color.parseColor("#FF0000");
     int blue = Color.parseColor("#0000FF");
 
     String temp1,temp2,temp3,temp4;
-    String strtemp;
+    Map<String, Object> read = new HashMap<>();
+    Map<String, Object> bill = new HashMap<>();
 
-    List<String> list = new ArrayList<>();
+    String today = LocalDate.now().toString();
+    String yesterday = LocalDate.now().minusDays(1).toString();
+
     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("SafeGas");
 
     @Override
@@ -136,15 +144,21 @@ public class MainActivity extends AppCompatActivity {
 
         b1 = (Button) findViewById(R.id.button_first);
 
+        t3.setText("Previous Reading ("+yesterday+"):");
+        t4.setText("Current Reading ("+today+"):");
+        e3.setFocusable(false);
+
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                list.clear();
-                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    strtemp = snapshot.getValue().toString();
-                    System.out.println(strtemp.substring(1, strtemp.length()-2));
-                    list.add(strtemp.substring(1, strtemp.length()-2));
-                }
+
+                temp1 = dataSnapshot.child("Days").getValue().toString();
+                temp3 = dataSnapshot.child("Reading("+yesterday+')').getValue().toString();
+                N = Integer.parseInt(temp1);
+                Previous_Reading = Integer.parseInt(temp3);
+
+                e1.setText(temp1);
+                e3.setText(temp3);
             }
 
             @Override
@@ -153,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 t5.setTextColor(red);
             }
         });
+
 
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 else
                     e4.setError(null);
 
-                if (TextUtils.isEmpty(temp1) || TextUtils.isEmpty(temp2) || TextUtils.isEmpty(temp3) || TextUtils.isEmpty(temp4)){
+                if (TextUtils.isEmpty(temp1) || TextUtils.isEmpty(temp2) || TextUtils.isEmpty(temp4)){
                     t5.setText("All inputs must be filled");
                     t5.setTextColor(red);
                 }
@@ -200,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
                     Previous_Reading = Integer.parseInt(temp3);
                     Current_Reading = Integer.parseInt(temp4);
 
+                    read.put("Reading("+today+')',temp4);
+                    mDatabase.updateChildren(read);
+
                     e1.setError(null);
                     e2.setError(null);
                     e3.setError(null);
@@ -212,42 +230,50 @@ public class MainActivity extends AppCompatActivity {
                     {
                         case 1:
                             System.out.println("Domestic_1");
-                            t5.append("Domestic_1\n\n");
+                            t5.append(Html.fromHtml("<b><u>Domestic_1</u></b>"));
+                            t5.append("\n\n");
                             finalCalculations ();
                             break;
                         case 2:
                             System.out.println("Domestic_2");
-                            t5.append("Domestic_2\n\n");
+                            t5.append(Html.fromHtml("<b><u>Domestic_2</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         case 3:
                             System.out.println("Commercial");
-                            t5.append("Commercial\n\n");
+                            t5.append(Html.fromHtml("<b><u>Commercial</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         case 4:
                             System.out.println("Special Commercial");
-                            t5.append("Special Commercial\n\n");
+                            t5.append(Html.fromHtml("<b><u>Special Commercial</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         case 5:
                             System.out.println("Ice Factories");
-                            t5.append("Ice Factories\n\n");
+                            t5.append(Html.fromHtml("<b><u>Ice Factories</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         case 6:
                             System.out.println("General Industries");
-                            t5.append("General Industries\n\n");
+                            t5.append(Html.fromHtml("<b><u>General Industries</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         case 7:
                             System.out.println("Manufacturers");
-                            t5.append("Manufacturers\n\n");
+                            t5.append(Html.fromHtml("<b><u>Manufacturers</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         case 8:
                             System.out.println("CNG");
-                            t5.append("CNG\n\n");
+                            t5.append(Html.fromHtml("<b><u>CNG</u></b>"));
+                            t5.append("\n\n");
                             Calculations();
                             break;
                         default:
@@ -279,15 +305,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_refresh) {
-            System.out.println("Update pressed. Update from firebase");
-
-            e1.setText(list.get(1));
-            e3.setText(list.get(2));
-            e4.setText(list.get(0));
-            return true;
-        }
-        else if (id == R.id.action_clear) {
+        if (id == R.id.action_clear) {
             System.out.println("Clear pressed.");
 
             e1.setError(null);
@@ -297,7 +315,6 @@ public class MainActivity extends AppCompatActivity {
 
             e1.setText("");
             e2.setText("");
-            e3.setText("");
             e4.setText("");
             t5.setText("");
 
@@ -319,20 +336,21 @@ public class MainActivity extends AppCompatActivity {
         PressureFactor = (P + 14.65) / 14.65;
         System.out.println("The Pressure Factor is" + PressureFactor);
 
-        System.out.println("Previous Reading = ");
-        /*Previous_Reading = input.nextDouble();*/
+        /*System.out.println("Previous Reading = ");
+        Previous_Reading = input.nextDouble();
         System.out.println("Current Reading = ");
-        /*Current_Reading = input.nextDouble();*/
+        Current_Reading = input.nextDouble();*/
         double D;
         double D_hm3;
         D = Current_Reading - (Previous_Reading);
         D_hm3 = D * pow (10, -5);
-        System.out.println("The difference in Hm3 is" + D_hm3);
-        t5.append("The difference in Hm3 is " + D_hm3+"\n\n");
+        //System.out.println("The difference in Hm3 is" + D_hm3);
+        //t5.append("The difference in Hm3 is " + D_hm3+"\n\n");
 
         Gas_consumption = PressureFactor * D_hm3;
-        System.out.println("The gas consumption is " + Gas_consumption);
-        t5.append("The gas consumption is " + Gas_consumption+"\n\n");
+        //System.out.println("The gas consumption is " + Gas_consumption);
+        t5.append(Html.fromHtml("<b>GAS CONSUMPTION: </b>"));
+        t5.append(Gas_consumption+"\n\n");
 
         i = Gas_consumption;
 
@@ -341,8 +359,9 @@ public class MainActivity extends AppCompatActivity {
         MMBTU = (i * GCV);
         /*cout<<("\n%f\n",MMBTU); */
         mmbtu_1 = (MMBTU / 281.7385);
-        System.out.println("The MMBTU calculated is " + mmbtu_1);
-        t5.append("The MMBTU calculated is " + mmbtu_1+"\n\n");
+        //System.out.println("The MMBTU calculated is " + mmbtu_1);
+        t5.append(Html.fromHtml("<b>MMBTU: </b>"));
+        t5.append(mmbtu_1+"\n\n");
         return mmbtu_1;
     }
 
@@ -387,7 +406,8 @@ public class MainActivity extends AppCompatActivity {
             Slab_rate = Slab_Rate6;
 
         }
-        t5.append("The Slab Rate per MMBTU is " + Slab_rate+"\n\n");
+        t5.append(Html.fromHtml("<b>DEDICATED SLAB RATE: </b>"));
+        t5.append(Slab_rate+"\n\n");
         return Slab_rate;
     }
 
@@ -399,23 +419,18 @@ public class MainActivity extends AppCompatActivity {
         newSlab_l4 = (Slab_4 * N) / 30;
         newSlab_l5 = (Slab_5 * N) / 30;
 
-        System.out.println("The New slab division is as follows:");
-        System.out.println("Sale Price                                 Rs/MMBTU");
-        System.out.println("Upto " + newSlab_l1+"hm3 per month         121.00Rs");
-        System.out.println("Upto " + newSlab_l2+"hm3 per month         300.00Rs");
-        System.out.println("Upto " + newSlab_l3+"hm3 per month         553.00Rs");
-        System.out.println("Upto " + newSlab_l4+"hm3 per month         738.00Rs");
-        System.out.println("Upto " + newSlab_l5+"hm3 per month         1107.00Rs");
-        System.out.println("Upto " + newSlab_l5+"hm3 per month         1460.00Rs");
-
-        t5.append("The New slab division is as follows:"+"\n\n");
-        t5.append("Sale Price                                 Rs/MMBTU"+"\n\n");
-        t5.append("Upto " + newSlab_l1+"hm3 per month         121.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l2+"hm3 per month         300.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l3+"hm3 per month         553.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l4+"hm3 per month         738.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l5+"hm3 per month         1107.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l5+"hm3 per month         1460.00Rs"+"\n\n");
+        t5.append("\n");
+        t5.append(Html.fromHtml("<b>(SLAB DIVISION)</b>"));
+        t5.append("\n\n");
+        t5.append(Html.fromHtml("<b>Sale Price</b>"));
+        t5.append("                                      ");
+        t5.append(Html.fromHtml("<b>Rs/MMBTU</b>"));
+        t5.append("\n\nUpto    " + String.format("%.2f", newSlab_l1)+" hm3 per month          121.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_l2)+" hm3 per month          300.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_l3)+" hm3 per month          553.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_l4)+" hm3 per month          738.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_l5)+" hm3 per month        1107.00 Rs"+"\n\n");
+        t5.append("Above " + String.format("%.2f", newSlab_l5)+" hm3 per month        1460.00 Rs"+"\n\n\n");
 
         if (i >= Slab_0 && i <= newSlab_l1)
         {
@@ -458,7 +473,8 @@ public class MainActivity extends AppCompatActivity {
             Slab_rate = Slab_Rate6;
 
         }
-        t5.append("The Slab Rate per MMBTU is " + Slab_rate+"\n\n");
+        t5.append(Html.fromHtml("<b>DEDICATED SLAB RATE: </b>"));
+        t5.append(Slab_rate+"\n\n");
         return Slab_rate;
     }
 
@@ -476,29 +492,24 @@ public class MainActivity extends AppCompatActivity {
         newSlab_g4 = (Slab_4 * N) / 30;
         newSlab_g5 = (Slab_5 * N) / 30;
 
-        System.out.println("The New slab division is as follows:");
-        System.out.println("Sale Price                                 Rs/MMBTU");
-        System.out.println("Upto " + newSlab_g1+"hm3 per month         121.00Rs");
-        System.out.println("Upto " + newSlab_g2+"hm3 per month         300.00Rs");
-        System.out.println("Upto " + newSlab_g3+"hm3 per month         553.00Rs");
-        System.out.println("Upto " + newSlab_g4+"hm3 per month         738.00Rs");
-        System.out.println("Upto " + newSlab_g5+"hm3 per month         1107.00Rs");
-        System.out.println("Upto " + newSlab_g5+"hm3 per month         1460.00Rs");
 
-
-        t5.append("The New slab division is as follows:"+"\n\n");
-        t5.append("Sale Price                                 Rs/MMBTU"+"\n\n");
-        t5.append("Upto " + newSlab_l1+"hm3 per month         121.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l2+"hm3 per month         300.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l3+"hm3 per month         553.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l4+"hm3 per month         738.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l5+"hm3 per month         1107.00Rs"+"\n\n");
-        t5.append("Upto " + newSlab_l5+"hm3 per month         1460.00Rs"+"\n\n");
+        t5.append("\n");
+        t5.append(Html.fromHtml("<b>(SLAB DIVISION)</b>"));
+        t5.append("\n\n");
+        t5.append(Html.fromHtml("<b>Sale Price</b>"));
+        t5.append("                                      ");
+        t5.append(Html.fromHtml("<b>Rs/MMBTU</b>"));
+        t5.append("\n\nUpto    " + String.format("%.2f", newSlab_g1)+" hm3 per month          121.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_g2)+" hm3 per month          300.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_g3)+" hm3 per month          553.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_g4)+" hm3 per month          738.00 Rs"+"\n\n");
+        t5.append("Upto    " + String.format("%.2f", newSlab_g5)+" hm3 per month        1107.00 Rs"+"\n\n");
+        t5.append("Above " + String.format("%.2f", newSlab_g5)+" hm3 per month        1460.00 Rs"+"\n\n\n");
 
         if (i >= Slab_0 && i <= newSlab_g1)
         {
             System.out.println("The Slab Rate per MMBTU is " + Slab_Rate1);
-            return Slab_rate = Slab_Rate1;
+            Slab_rate = Slab_Rate1;
         }
 
         else if (i > newSlab_g1 && i <= newSlab_g2)
@@ -534,7 +545,8 @@ public class MainActivity extends AppCompatActivity {
             Slab_rate = Slab_Rate6;
         }
 
-        t5.append("The Slab Rate per MMBTU is " + Slab_rate+"\n\n");
+        t5.append(Html.fromHtml("<b>DEDICATED SLAB RATE: </b>"));
+        t5.append(Slab_rate+"\n\n");
         return Slab_rate;
     }
 
@@ -728,7 +740,8 @@ public class MainActivity extends AppCompatActivity {
             meterRent_30 ();
             System.out.println("Your meter rent is "+Meter_Rent);
             MeterRent = Meter_Rent;
-            t5.append("Your meter rent is Rs."+Meter_Rent+"\n\n");
+            t5.append(Html.fromHtml("<b>METER RENT: </b>"));
+            t5.append("Rs. "+Meter_Rent+".00\n\n");
         }
 
         else if (N < 30)
@@ -736,7 +749,8 @@ public class MainActivity extends AppCompatActivity {
             meterRent_L30 ();
             System.out.println("Your meter rent is"+NewMeterRent_L);
             MeterRent = NewMeterRent_L;
-            t5.append("Your meter rent is Rs."+Meter_Rent+"\n\n");
+            t5.append(Html.fromHtml("<b>METER RENT: </b>"));
+            t5.append("Rs. "+Meter_Rent+".00\n\n");
         }
 
         else if (N > 30)
@@ -744,7 +758,8 @@ public class MainActivity extends AppCompatActivity {
             meterRent_M30 ();
             System.out.println("Your meter rent is"+NewMeterRent_M);
             MeterRent = NewMeterRent_M;
-            t5.append("Your meter rent is Rs."+Meter_Rent+"\n\n");
+            t5.append(Html.fromHtml("<b>METER RENT: </b>"));
+            t5.append("Rs. "+Meter_Rent+".00\n\n");
         }
 
         else
@@ -1000,7 +1015,7 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println("You have entered an invalid meter type");
                     t5.append("You have entered an invalid meter type\n");
             }
-            t5.append("The final gas charges are Rs."+Final_Gcharges+"\n\n");
+            //t5.append("The final gas charges are Rs."+Final_Gcharges+"\n\n");
             return Final_Gcharges;
         }
         else{
@@ -1019,14 +1034,14 @@ public class MainActivity extends AppCompatActivity {
         {
             MinChg = minimumCharges_ML30 (Final_Gcharges);
             System.out.println("The Minimum Charges are "+MinChg);
-            t5.append("The Minimum Charges are Rs."+MinChg+"\n\n");
+            //t5.append("The Minimum Charges are Rs."+MinChg+"\n\n");
             return MinChg;
         }
         else if (N > 30)
         {
             MinChg = minimumCharges_ML30 (Final_Gcharges);
             System.out.println("The Minimum Charges are "+MinChg);
-            t5.append("The Minimum Charges are Rs."+MinChg+"\n\n");
+            //t5.append("The Minimum Charges are Rs."+MinChg+"\n\n");
             return MinChg;
         }
         else
@@ -1098,8 +1113,11 @@ public class MainActivity extends AppCompatActivity {
             totalPayble_Bill = Tax + x;
         }
 
-        System.out.println("The estimated bill is :"+totalPayble_Bill);
-        t5.append("The estimated bill is: Rs. "+totalPayble_Bill);
+        //System.out.println("The estimated bill is :"+totalPayble_Bill);
+        t5.append(Html.fromHtml("<b>ESTIMATED BILL: </b>"));
+        t5.append("Rs. "+String.format("%.2f", totalPayble_Bill));
+        bill.put("Bill("+today+')',String.format("%.2f", totalPayble_Bill));
+        mDatabase.updateChildren(bill);
         return -1;
     }
 
@@ -1125,8 +1143,11 @@ public class MainActivity extends AppCompatActivity {
             totalPayble_Bill=Tax+x;
         }
         //output send to firebase
-        System.out.println("The total payable bill is :"+totalPayble_Bill);
-        t5.append("The estimated bill is: Rs. "+totalPayble_Bill);
+        //System.out.println("The total payable bill is :"+totalPayble_Bill);
+        t5.append(Html.fromHtml("<b>ESTIMATED BILL: </b>"));
+        t5.append("Rs. "+String.format("%.2f", totalPayble_Bill));
+        bill.put("Bill("+today+')',String.format("%.2f", totalPayble_Bill));
+        mDatabase.updateChildren(bill);
         return -1;
     }
 }
