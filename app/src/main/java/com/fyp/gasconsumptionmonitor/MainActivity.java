@@ -3,26 +3,27 @@ package com.fyp.gasconsumptionmonitor;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.Math.pow;
@@ -110,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
     int blue = Color.parseColor("#0000FF");
 
     String temp1,temp2,temp3,temp4;
+    String strtemp;
+
+    List<String> list = new ArrayList<>();
+    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("SafeGas");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +136,24 @@ public class MainActivity extends AppCompatActivity {
 
         b1 = (Button) findViewById(R.id.button_first);
 
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                list.clear();
+                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    strtemp = snapshot.getValue().toString();
+                    System.out.println(strtemp.substring(1, strtemp.length()-2));
+                    list.add(strtemp.substring(1, strtemp.length()-2));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                t5.setText("Cannot connect to database");
+                t5.setTextColor(red);
+            }
+        });
+
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,18 +165,32 @@ public class MainActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(temp1))
                     e1.setError("Required");
+                else
+                    e1.setError(null);
                 if (TextUtils.isEmpty(temp2))
                     e2.setError("Required");
+                else
+                    e2.setError(null);
                 if (TextUtils.isEmpty(temp3))
                     e3.setError("Required");
+                else
+                    e3.setError(null);
                 if (TextUtils.isEmpty(temp4))
                     e4.setError("Required");
+                else
+                    e4.setError(null);
 
                 if (TextUtils.isEmpty(temp1) || TextUtils.isEmpty(temp2) || TextUtils.isEmpty(temp3) || TextUtils.isEmpty(temp4)){
                     t5.setText("All inputs must be filled");
                     t5.setTextColor(red);
                 }
+                else if(TextUtils.isEmpty(temp2)){
+                    e2.requestFocus();
+                }
                 else if(Integer.parseInt(temp2)<1 || Integer.parseInt(temp2)>8){
+                    t5.setText("Option 1 to 8 should be selected");
+                    t5.setTextColor(red);
+
                     e2.setError("Option 1 to 8 should be selected");
                     e2.requestFocus();
                 }
@@ -162,6 +199,11 @@ public class MainActivity extends AppCompatActivity {
                     meter = Integer.parseInt(temp2);
                     Previous_Reading = Integer.parseInt(temp3);
                     Current_Reading = Integer.parseInt(temp4);
+
+                    e1.setError(null);
+                    e2.setError(null);
+                    e3.setError(null);
+                    e4.setError(null);
 
                     t5.setText("");
                     t5.setTextColor(blue);
@@ -238,19 +280,35 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            System.out.println("Refresh pressed. Update from firebase");
+            System.out.println("Update pressed. Update from firebase");
+
+            e1.setText(list.get(1));
+            e3.setText(list.get(2));
+            e4.setText(list.get(0));
+            return true;
+        }
+        else if (id == R.id.action_clear) {
+            System.out.println("Clear pressed.");
+
+            e1.setError(null);
+            e2.setError(null);
+            e3.setError(null);
+            e4.setError(null);
+
+            e1.setText("");
+            e2.setText("");
+            e3.setText("");
+            e4.setText("");
+            t5.setText("");
+
+            e1.requestFocus();
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
-
-
-    }
     /* Calculatng MMBTU*/
     public double Calcualting_MMBTU() {
 

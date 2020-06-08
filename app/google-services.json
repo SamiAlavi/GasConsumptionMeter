@@ -1,0 +1,114 @@
+{
+  "project_info": {
+    "project_number": "581174997095",
+    "firebase_url": "https://safe-gas-consumption.firebaseio.com",
+    "project_id": "safe-gas-consumption",
+    "storage_bucket": "safe-gas-consumption.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581174997095:android:23ae867766f8c83beb24c2",
+        "android_client_info": {
+          "package_name": "com.SafeGas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "581174997095-u65lrpbdglckrdgoj2eqfojseqdpe7ah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1KVZ8NVe9osYKjLJdXnijdMXylSu5s2Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "581174997095-u65lrpbdglckrdgoj2eqfojseqdpe7ah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581174997095:android:2fa07b4eaeaa64b9eb24c2",
+        "android_client_info": {
+          "package_name": "com.example.bill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "581174997095-2ltd22acbmh227q5gugtp92dbbfdjnpl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bill",
+            "certificate_hash": "70e9ec88b9756e581def4e1a80d672e2395ba34b"
+          }
+        },
+        {
+          "client_id": "581174997095-u65lrpbdglckrdgoj2eqfojseqdpe7ah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1KVZ8NVe9osYKjLJdXnijdMXylSu5s2Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "581174997095-u65lrpbdglckrdgoj2eqfojseqdpe7ah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581174997095:android:c5b4610174e36391eb24c2",
+        "android_client_info": {
+          "package_name": "com.fyp.gasconsumptionmonitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "581174997095-bd27ik5h6u4fv72jdjj11afq8bo5avq8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fyp.gasconsumptionmonitor",
+            "certificate_hash": "f1bf623062d5c595a9cf417077535fb96b1e1ca5"
+          }
+        },
+        {
+          "client_id": "581174997095-u65lrpbdglckrdgoj2eqfojseqdpe7ah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1KVZ8NVe9osYKjLJdXnijdMXylSu5s2Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "581174997095-u65lrpbdglckrdgoj2eqfojseqdpe7ah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
