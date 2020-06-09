@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
     TextView t1,t2,t3,t4,t5;
     EditText e1,e2,e3,e4;
     Button b1;
+    int tempN = 1;
+    boolean tt1,tt2,tt3,tt4;
 
     int red = Color.parseColor("#FF0000");
     int blue = Color.parseColor("#0000FF");
@@ -144,15 +146,14 @@ public class MainActivity extends AppCompatActivity {
 
         b1 = (Button) findViewById(R.id.button_first);
 
-        t3.setText("Previous Reading ("+yesterday+"):");
-        t4.setText("Current Reading ("+today+"):");
-        e3.setFocusable(false);
-
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                temp1 = dataSnapshot.child("Days").getValue().toString();
+                if (tempN==1){
+                    temp1 = dataSnapshot.child("Days").getValue().toString();
+                    tempN = 0;
+                }
                 temp3 = dataSnapshot.child("Reading("+yesterday+')').getValue().toString();
                 N = Integer.parseInt(temp1);
                 Previous_Reading = Integer.parseInt(temp3);
@@ -178,28 +179,33 @@ public class MainActivity extends AppCompatActivity {
                 temp3 = e3.getText().toString();
                 temp4 = e4.getText().toString();
 
-                if (TextUtils.isEmpty(temp1))
+                tt1 = TextUtils.isEmpty(temp1);
+                tt2 = TextUtils.isEmpty(temp2);
+                tt3 = TextUtils.isEmpty(temp3);
+                tt4 = TextUtils.isEmpty(temp4);
+
+                if (tt1)
                     e1.setError("Required");
                 else
                     e1.setError(null);
-                if (TextUtils.isEmpty(temp2))
+                if (tt2)
                     e2.setError("Required");
                 else
                     e2.setError(null);
-                if (TextUtils.isEmpty(temp3))
+                if (tt3)
                     e3.setError("Required");
                 else
                     e3.setError(null);
-                if (TextUtils.isEmpty(temp4))
+                if (tt4)
                     e4.setError("Required");
                 else
                     e4.setError(null);
 
-                if (TextUtils.isEmpty(temp1) || TextUtils.isEmpty(temp2) || TextUtils.isEmpty(temp4)){
+                if (tt1 || tt2 || tt3 ||tt4){
                     t5.setText("All inputs must be filled");
                     t5.setTextColor(red);
                 }
-                else if(TextUtils.isEmpty(temp2)){
+                else if(tt2){
                     e2.requestFocus();
                 }
                 else if(Integer.parseInt(temp2)<1 || Integer.parseInt(temp2)>8){
@@ -208,6 +214,14 @@ public class MainActivity extends AppCompatActivity {
 
                     e2.setError("Option 1 to 8 should be selected");
                     e2.requestFocus();
+                }
+                else if(temp3.length()!=8){
+                    e3.setError("Should be of 8 digits");
+                    e3.requestFocus();
+                }
+                else if(temp4.length()!=8){
+                    e4.setError("Should be of 8 digits");
+                    e4.requestFocus();
                 }
                 else{
                     N = Integer.parseInt(temp1);
