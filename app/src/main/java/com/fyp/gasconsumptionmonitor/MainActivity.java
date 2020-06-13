@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -124,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
     String today = LocalDate.now().toString();
     String yesterday = LocalDate.now().minusDays(1).toString();
 
+    ScrollView scrl;
+
     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("SafeGas");
 
     @Override
@@ -144,11 +147,14 @@ public class MainActivity extends AppCompatActivity {
         e3 = (EditText) findViewById(R.id.e3);
         e4 = (EditText) findViewById(R.id.e4);
 
+        scrl = (ScrollView) findViewById(R.id.scrl_view);
+
         b1 = (Button) findViewById(R.id.button_first);
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                scrl.setBackgroundColor(Color.parseColor(dataSnapshot.child("Color").getValue().toString()));
 
                 if (tempN==1){
                     temp1 = dataSnapshot.child("Days").getValue().toString();
